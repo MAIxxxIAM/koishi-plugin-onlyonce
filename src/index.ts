@@ -34,18 +34,24 @@ export function apply(ctx: Context) {
       const nowTime=new Date()
       const theEnd=new Date(nowTime.getFullYear(),nowTime.getMonth(), nowTime.getDate(), 23, 59, 59, 999)
       const muteTime=theEnd.getTime()-nowTime.getTime()
-      await ctx.database.upsert('mutelist',[{id:userID,channelID:channelId}])
       await session.bot.muteGuildMember(channelId,userID,muteTime)
       return next()
     }
     return next()
   })
   ctx.command('onlyonce <user>', '只能发一次',{ authority: 4 })
-  .action(async ({session},user)=>{
+  .action(async ({session})=>{
     const muteMember=session.elements[1].attrs.id
     const channelID=session.channelId
-    await ctx.database.upsert('mutelist',[{id:muteMember,channelID:channelID}])
     await session.bot.muteGuildMember(channelID,muteMember,1000*60*60*0.5)
+  })
+
+  ctx.command('or <user>', '解除禁言',{ authority: 4 })
+  .action(async ({session})=>{
+    const muteMember=session.elements[1].attrs.id
+    const channelID=session.channelId
+    await ctx.database.remove('mutelist',{id:muteMember,channelID:channelID})
+    await session.bot.muteGuildMember(channelID,muteMember,0)
   })
   
 }
