@@ -43,6 +43,7 @@ export function apply(ctx: Context) {
   .action(async ({session})=>{
     const muteMember=session.elements[1].attrs.id
     const channelID=session.channelId
+    await ctx.database.create('mutelist',{id:muteMember,channelID:channelID})
     await session.bot.muteGuildMember(channelID,muteMember,1000*60*60*0.5)
   })
 
